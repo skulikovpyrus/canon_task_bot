@@ -1,7 +1,7 @@
 from flask import Flask
 from flask import request
-from task_manager_bot import TaskManagerBot
-from settings import LOGIN, SECRET
+from bot import Bot
+
 
 import json
 app = Flask(__name__)
@@ -13,9 +13,9 @@ def index():
     task = data["task"]
     settings = json.loads(data["bot_settings"])
 
-    bot = TaskManagerBot(LOGIN, SECRET, settings, task["id"])
-    if bot.authenticated:
-        response = bot.check_task()
+    bot = Bot(settings, task["id"])
+    response = bot.check_task()
+    if response:
         return response
     return "Hello"
 

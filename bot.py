@@ -1,47 +1,29 @@
-from pyrus import client
-from pyrus.models.requests import FormRegisterRequest, TaskCommentRequest
-
-
 class Bot:
-	def __init__(self, login, secret, settings):
-		self.login = login
-		self.secret = secret
-		self.settings = settings
-		self.pyrusAPI = client.PyrusAPI(login=self.login, security_key=self.secret)
-		self.authenticated = self.pyrusAPI.auth().success
+    def __init__(self, settings, task):
+        self.settings = settings
+        self.task = task
+        self.task_list_ids = self.task["list_ids"]
+        self.form_steps = self.settings["steps"]
+        self.steps_sublists = list(self.form_steps.values())
 
-		self.forms = self.get_forms()
-		self.form_tasks = self.get_form_tasks()
-		self.lists = self.get_lists()
-		self.list_tasks = self.get_list_tasks()
+    def check_task(self):
+        current_step = self.task["current_step"]
+        necessary_sublist_id = self.form_steps[str(current_step)]
+        filtered_steps_sublists = [_list for _list in self.steps_sublists if _list != necessary_sublist_id]
 
-	def get_forms(self):
-		forms = self.pyrusAPI.get_forms().forms
-		return forms
+        if necessary_sublist_id not in self.task_list_ids:
+            response = {"added_list_ids": [necessary_sublist_id]}
 
-	def get_lists(self):
-		lists = self.pyrusAPI.get_lists().lists
-		return lists
+            if self.list_ids_has_prev_sublist(filtered_steps_sublists):
+                prev_sublist_id = self.get_prev_sublist_id()
+                response["removed_list_ids"] = [prev_sublist_id]
+                return response
+            return response
 
-	def get_list_tasks(self):
-		tasks = {}
-		if self.lists:
-			for _list in self.lists:
-				tasks[_list.id] = self.pyrusAPI.get_task_list(_list.id).tasks
-			return tasks
+    def list_ids_has_prev_sublist(self, another_sublists):
+        return any(map(lambda x: x in self.task_list_ids, another_sublists))
 
-	def get_form_tasks(self):
-		tasks = {}
-		request = FormRegisterRequest(include_archived=True)
-		if self.forms:
-			for form in self.forms:
-				tasks[form.id] = self.pyrusAPI.get_registry(form.id, request).tasks
-			return tasks
-
-	def get_task(self, task_id):
-		task = self.pyrusAPI.get_task(task_id).task
-		return task
-
-	def send_comment(self, **kwargs):
-		comment = kwargs
-		return comment
+    def get_prev_sublist_id(self):
+        for sublist_id in self.steps_sublists:
+            if sublist_id in self.task_list_ids:
+                return sublist_id
