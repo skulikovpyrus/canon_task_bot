@@ -1,0 +1,2 @@
+LOGIN = "bot@37ca6971-eeeb-4b84-b4df-405cf65049fd"
+SECRET = "jW1BzN3f~SZBgtiWs94S25Pf31JAo6gQlXY3qavwXlvNg4upN1e3PGBuv2SVpXY4jGNjzDq27Dz-h8tOWijKvKprOaRl04Tc"
