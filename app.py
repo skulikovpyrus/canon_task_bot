@@ -13,7 +13,7 @@ def index():
     task = data["task"]
     settings = json.loads(data["bot_settings"])
 
-    bot = Bot(settings, task["id"])
+    bot = Bot(settings, task)
     response = bot.check_task()
     if response:
         return response
