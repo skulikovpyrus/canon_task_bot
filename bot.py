@@ -20,9 +20,11 @@ class Bot:
                 return response
             return response
 
+    # метод проверяет есть ли в массиве идентификаторов списков старые предыдущие подсписки
     def list_ids_has_prev_sublist(self, another_sublists):
         return any(map(lambda x: x in self.task_list_ids, another_sublists))
 
+    # метод возвращает идентификатор предыдущего подсписка
     def get_prev_sublist_id(self):
         for sublist_id in self.steps_sublists:
             if sublist_id in self.task_list_ids:
