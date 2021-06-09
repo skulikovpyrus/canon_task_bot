@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import request
+from flask import request, Response
 from bot import Bot
 
 
@@ -14,10 +14,10 @@ def index():
     settings = json.loads(data["bot_settings"])
 
     bot = Bot(settings, task)
-    response = bot.check_task()
-    if response:
-        return response
-    return "Hello"
+    _response = bot.check_task()
+    if _response:
+        return _response
+    return Response(status=200)
 
 
 if __name__ == "__main__":
